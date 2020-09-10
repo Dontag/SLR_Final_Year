@@ -23,6 +23,12 @@ class Camera_S extends PureComponent {
     depth: 0,
     type: 'back',
     ratio: '16:9',
+    recordOptions: {
+      mute: false,
+      maxDuration: 5,
+      quality: RNCamera.Constants.VideoQuality['288p'],
+    },
+    isRecording: false,
     canDetectBarcode: true,
     barcodes: [],
     barcodeValue: '',
@@ -126,22 +132,22 @@ class Camera_S extends PureComponent {
 
   }
 
-  // takeVideo = async () => {
-  //   const { isRecording } = this.state;
-  //   if (this.camera && !isRecording) {
-  //     try {
-  //       const promise = this.camera.recordAsync(this.state.recordOptions);
+  takeVideo = async () => {
+    const { isRecording } = this.state;
+    if (this.camera && !isRecording) {
+      try {
+        const promise = this.camera.recordAsync(this.state.recordOptions);
 
-  //       if (promise) {
-  //         this.setState({ isRecording: true });
-  //         const data = await promise;
-  //         console.warn('takeVideo', data);
-  //       }
-  //     } catch (e) {
-  //       console.error(e);
-  //     }
-  //   }
-  // };
+        if (promise) {
+          this.setState({ isRecording: true });
+          const data = await promise;
+          console.warn('takeVideo', data);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
 
 
 

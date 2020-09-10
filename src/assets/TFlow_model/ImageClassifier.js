@@ -13,10 +13,10 @@ const imageClassifier = (props) => {
   })
 
   tflite.loadModel({
-    // model: 'models/imageClassifier_M.tflite',// required
-    // labels: 'models/labels.txt',  // required
-    model: 'models/Emotion_Model.tflite',// required
-    labels: 'models/Emotion_Labels.txt',  // required
+    model: 'models/imageClassifier_M.tflite',// required
+    labels: 'models/labels.txt',  // required
+    // model: 'models/Emotion_Model.tflite',// required
+    // labels: 'models/Emotion_Labels.txt',  // required
     numThreads: 1,                              // defaults to 1
   },
     (err, res) => {
