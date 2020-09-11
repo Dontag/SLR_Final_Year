@@ -10,12 +10,14 @@ import ImageClassifier from '../TFlow_model/ImageClassifier';
 const GTT_C_S = (props) => {
     return (
         <View style={styles.GTT_Main_View}>
-            <ScrollView style={styles.GTT_Scroll_View} scrollsToEnd={true}>
-                <Text style={styles.GTT_Scroll_View_Text}>
-                    <ImageClassifier />
-                    {/* {CameraContextData.EnableClassifier  ? <ImageClassifier/> : "This is New Data"} */}
-                </Text>
-            </ScrollView>
+            <View style={styles.GTT_Main_Inner_View}>
+                <ScrollView style={styles.GTT_Scroll_View} scrollsToEnd={true}>
+                    <Text style={styles.GTT_Scroll_View_Text}>
+                        <ImageClassifier />
+                        {/* {CameraContextData.EnableClassifier  ? <ImageClassifier/> : "This is New Data"} */}
+                    </Text>
+                </ScrollView>
+            </View>   
         </View>
     );
 }
