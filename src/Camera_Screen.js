@@ -46,7 +46,7 @@ class Camera_S extends PureComponent {
   imageClassifier = (data) => {
     tflite.loadModel({
       model: 'models/imageClassifier_M.tflite',// required
-      labels: 'models/labels.txt',  // required
+      labels: 'models/labels_2.txt',  // required
       numThreads: 1,                              // defaults to 1
     },
       (err, res) => {
@@ -60,7 +60,7 @@ class Camera_S extends PureComponent {
       imageMean: 128.0,
       imageStd: 128.0,
       numResults: 1,
-      threshold: 0.05
+      threshold: 0.5
     },
       (err, res) => {
         if (err) {
@@ -107,9 +107,9 @@ class Camera_S extends PureComponent {
   takePicture = async () => {
     let boolFlagvar = !this.state.boolFlag;
     if (this.camera) {
-      // const options = { quality: 0.8, base64: true };
+      const options = { quality: 0.8, base64: true };
       //  const data = await this.camera.takePictureAsync(options);
-      const data = await this.camera.takePictureAsync();
+      const data = await this.camera.takePictureAsync(options);
       console.log(data.uri);
       console.log(this.state.boolFlag, "bool");
 

@@ -14,7 +14,8 @@ class GTT_Camera_C extends Component {
                 <View style={styles.GTT_Main_Inner_View}>
                     <ScrollView style={styles.GTT_Scroll_View} scrollsToEnd={true}>
                         <Text style={styles.GTT_Scroll_View_Text}>
-                            {classificationData ? classificationData : "No Data available"}
+                            {classificationData !== '' ?
+                                classificationData : "No Data available"}
                         </Text>
                     </ScrollView>
                 </View>
