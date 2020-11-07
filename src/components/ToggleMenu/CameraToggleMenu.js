@@ -5,7 +5,7 @@ class CameraToggleMenu extends Component{
     render(){
         return(
             <View>
-
+                
             </View>
         );
     };

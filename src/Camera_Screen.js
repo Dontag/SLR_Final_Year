@@ -1,21 +1,22 @@
 import React, { PureComponent } from 'react';
-import ImageClassifier from './assets/TFlow_model/ImageClassifier';
-import CameraContext from './Context/cameraDataContext';
 import {
   View,
-  Text,
   StatusBar,
-  TouchableOpacity,
-  Alert,
+  Dimensions
 } from 'react-native';
-
-import { styles } from './styles/styles';
 import { RNCamera } from 'react-native-camera';
-import C_Header from './assets/components/Camera_Header';
-import C_Footer from './assets/components/Camera_Footer';
-import GTT_C_S from './assets/components/GTT_Camera_C';
+import Tflite from 'tflite-react-native';
 
+//Styles
+import { styles } from './assets/styles/styles';
 
+//Components
+import C_Header from './components/Camera_Header';
+import C_Footer from './components/Camera_Footer';
+import GTT_C_S from './components/GTT_Camera_C';
+
+let tflite = new Tflite();
+const { height, width } = Dimensions.get('window');
 class Camera_S extends PureComponent {
   state = {
     flash: 'off',
@@ -36,20 +37,44 @@ class Camera_S extends PureComponent {
     InsertVisible: false,
     submitDataFlag: 0,
     setBarRun: 0,
-    SnapData: '',
+    snapData: '',
     flag: 1,
     boolFlag: false,
+    classificationResult: ''
   };
 
-  AlertJoke = () => {
-    Alert.alert(
-      "Ooh Fuck!",
-      "Don't push so hardly, it hurts",
-      [
-        { text: "OK", onPress: () => { } }
-      ],
-      { cancelable: true }
-    );
+  imageClassifier = (data) => {
+    tflite.loadModel({
+      model: 'models/imageClassifier_M.tflite',// required
+      labels: 'models/labels.txt',  // required
+      numThreads: 1,                              // defaults to 1
+    },
+      (err, res) => {
+        if (err)
+          console.log('Something went Wrong---->', err);
+        else
+          console.log('Result---->', res);
+      });
+    tflite.runModelOnImage({
+      path: data,
+      imageMean: 128.0,
+      imageStd: 128.0,
+      numResults: 1,
+      threshold: 0.05
+    },
+      (err, res) => {
+        if (err) {
+          console.log('Something went Wrong 1---->', err);
+        } else {
+          console.log('Result 1---->', res);
+          res.map((labeldata) => {
+            this.setState((prevState) => ({
+              classificationResult: prevState.classificationResult + labeldata.label,
+            }))
+          })
+        }
+      });
+    tflite.close();
   }
 
   toggleFacing() {
@@ -79,43 +104,7 @@ class Camera_S extends PureComponent {
     });
   }
 
-  // touchToFocus(event) {
-  //   const { pageX, pageY } = event.nativeEvent;
-  //   const screenWidth = Dimensions.get('window').width;
-  //   const screenHeight = Dimensions.get('window').height;
-  //   const isPortrait = screenHeight > screenWidth;
-
-  //   let x = pageX / screenWidth;
-  //   let y = pageY / screenHeight;
-  //   // Coordinate transform for portrait. See autoFocusPointOfInterest in docs for more info
-  //   if (isPortrait) {
-  //     x = pageY / screenHeight;
-  //     y = -(pageX / screenWidth) + 1;
-  //   }
-
-  //   this.setState({
-  //     autoFocusPoint: {
-  //       normalized: { x, y },
-  //       drawRectPosition: { x: pageX, y: pageY },
-  //     },
-  //   });
-  // }
-
-  // setFocusDepth(depth) {
-  //   this.setState({
-  //     depth,
-  //   });
-  // }
-
-  // takePicture = async function() {
-  //   if (this.camera) {
-  //     const data = await this.camera.takePictureAsync();
-  //     console.warn('takePicture ', data);
-  //   }
-  // };
-
   takePicture = async () => {
-
     let boolFlagvar = !this.state.boolFlag;
     if (this.camera) {
       // const options = { quality: 0.8, base64: true };
@@ -126,8 +115,9 @@ class Camera_S extends PureComponent {
 
       this.setState({
         boolFlag: boolFlagvar,
-        SnapData: data.uri,
+        snapData: data.uri,
       })
+      this.imageClassifier(data.uri);
     }
 
   }
@@ -137,7 +127,6 @@ class Camera_S extends PureComponent {
     if (this.camera && !isRecording) {
       try {
         const promise = this.camera.recordAsync(this.state.recordOptions);
-
         if (promise) {
           this.setState({ isRecording: true });
           const data = await promise;
@@ -156,7 +145,7 @@ class Camera_S extends PureComponent {
 
 
   renderCamera() {
-
+    let { classificationResult } = this.state;
     return (
       <RNCamera
         ref={ref => {
@@ -164,9 +153,7 @@ class Camera_S extends PureComponent {
         }}
         style={{
           flex: 1,
-          height: "100%",
-          width: "100%",
-          //justifyContent: 'space-between',
+          justifyContent: "space-between"
         }}
         type={this.state.type}
         flashMode={this.state.flash}
@@ -182,27 +169,51 @@ class Camera_S extends PureComponent {
           buttonNegative: 'Cancel',
         }}
       >
-        <CameraContext.Provider value={{ SnapData: this.state.SnapData, EnableClassifier: this.state.boolFlag }}>
-          <View style={{ width: "100%", height: "100%" }}>
-            <View style={{ width: "100%", height: "10%" }}>
-              <C_Header LeftIconName={"ios-menu"} LeftIconSize={26} LeftIconColor={"white"} LeftOnPress={() => this.props.navigation.openDrawer()} CenterIconName={"ios-arrow-down"} CenterIconSize={34} CenterIconColor={"white"} CenterTextName={"Gesture To Text"} CenterTextColor={"white"} RightIconName={this.state.flashIcon} RightIconSize={26} RightIconColor={"white"} RightOnPress={this.toggleFlash.bind(this)} />
-            </View>
-            <View style={{ width: "100%", height: "80%", justifyContent: "flex-end" }}>
-              <GTT_C_S />
-              {/* {this.state.boolFlag ? <ImageClassifier ImageData={this.state.SnapData}/> : null} */}
-            </View>
-            <View style={{ width: "100%", height: "10%" }}>
-              <C_Footer MicIcon={"ios-mic"} ASL_ISL_Icon={"ASL"} LeftIconName={"ios-options"} LeftIconColor={"transparent"} LeftIconSize={26} CenterIconName={"ios-radio-button-on"} CenterIconColor={"white"} CenterIconSize={65} CenterOnPress={this.takePicture.bind(this)} RightIconName={"ios-reverse-camera"} RightIconColor={"white"} RightIconSize={34} RightOnPress={this.toggleFacing.bind(this)} />
-            </View>
-          </View>
-        </CameraContext.Provider>
+        <View style={{ width: width }}>
+          <C_Header
+            LeftIconName={"ios-menu"}
+            LeftIconSize={26}
+            LeftIconColor={"white"}
+            LeftOnPress={() => this.props.navigation.openDrawer()}
+            CenterIconName={"ios-arrow-down"}
+            CenterIconSize={34}
+            CenterIconColor={"white"}
+            CenterTextName={"Gesture To Text"}
+            CenterTextColor={"white"}
+            RightIconName={this.state.flashIcon}
+            RightIconSize={26}
+            RightIconColor={"white"}
+            RightOnPress={this.toggleFlash.bind(this)} />
+        </View>
+        <View style={{ width: width }}>
+          <GTT_C_S
+            classificationData={classificationResult}
+          />
+          <C_Footer
+            MicIcon={"ios-mic"}
+            ASL_ISL_Icon={"ASL"}
+            LeftIconName={"ios-options"}
+            LeftIconColor={"white"}
+            LeftIconSize={26}
+            CenterIconName={"ios-radio-button-on"}
+            CenterIconColor={"white"}
+            CenterIconSize={65}
+            CenterOnPress={this.takePicture.bind(this)}
+            RightIconName={"ios-reverse-camera"}
+            RightIconColor={"white"}
+            RightIconSize={34}
+            RightOnPress={this.toggleFacing.bind(this)} />
+        </View>
       </RNCamera>
     );
   }
 
   render() {
-    return (<View style={styles.Camera_S_Container_View}><StatusBar hidden={true} />{this.renderCamera()}
-    </View>);
+    return (
+      <View style={styles.Camera_S_Container_View}>
+        <StatusBar hidden={true} />
+        {this.renderCamera()}
+      </View>);
   }
 }
 

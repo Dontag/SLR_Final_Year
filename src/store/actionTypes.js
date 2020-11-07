@@ -1,0 +1,2 @@
+export const SET_SNAPDATA = 'SET_SNAPDATA';
+export const ENABLE_CLASSIFIER = 'ENABLE_CLASSIFIER';

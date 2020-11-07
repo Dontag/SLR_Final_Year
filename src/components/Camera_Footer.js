@@ -6,7 +6,7 @@ import {
     TouchableOpacity
 } from 'react-native';
 
-import { styles } from '../../styles/styles';
+import { styles } from '../assets/styles/styles';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 
@@ -31,11 +31,11 @@ class C_Footer extends Component {
         const { ASL_ISL_Icon, MicIcon, LeftIconName, LeftIconSize, LeftIconColor, LeftOnPress, CenterIconName, CenterIconSize, CenterIconColor, CenterOnPress, RightIconName, RightIconSize, RightIconColor, RightOnPress } = this.props
         return (
             <View style={styles.Camera_S_Footer_Main_View}>
-                <View style={{ margin: "3%" }} >
+                <View style={{ justifyContent: "center", alignItems: "center", marginLeft: 25, padding: 10 }} >
                     <Icon name={LeftIconName} size={LeftIconSize} color={LeftIconColor} onPress={LeftOnPress} />
                 </View>
                 <View style={styles.Camera_S_Footer_Eye_View} >
-                    <View style={{ margin: "3%" }}>
+                    <View style={styles.ASL_Left_Icon_Press}>
                         <Icon name={MicIcon} size={RightIconSize} color={RightIconColor} onPress={RightOnPress} />
                     </View>
                     <View style={styles.Camera_S_Footer_Center_Element_View}>
@@ -49,8 +49,7 @@ class C_Footer extends Component {
                         </TouchableOpacity>
                     </View>
                 </View>
-
-                <View style={{ margin: "3%" }}>
+                <View style={{ justifyContent: "center", alignItems: "center", marginRight: 25, padding: 10 }}>
                     <Icon name={RightIconName} size={RightIconSize} color={RightIconColor} onPress={RightOnPress} />
                 </View>
             </View>
