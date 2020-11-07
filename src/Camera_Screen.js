@@ -118,16 +118,16 @@ class Camera_S extends PureComponent {
 
     let boolFlagvar = !this.state.boolFlag;
     if (this.camera) {
-        // const options = { quality: 0.8, base64: true };
+      // const options = { quality: 0.8, base64: true };
       //  const data = await this.camera.takePictureAsync(options);
-        const data = await this.camera.takePictureAsync();
-        console.log(data.uri);
-        console.log(this.state.boolFlag, "bool");
+      const data = await this.camera.takePictureAsync();
+      console.log(data.uri);
+      console.log(this.state.boolFlag, "bool");
 
-        this.setState({
-          boolFlag: boolFlagvar,
-          SnapData: data.uri,
-        })
+      this.setState({
+        boolFlag: boolFlagvar,
+        SnapData: data.uri,
+      })
     }
 
   }
@@ -192,7 +192,7 @@ class Camera_S extends PureComponent {
               {/* {this.state.boolFlag ? <ImageClassifier ImageData={this.state.SnapData}/> : null} */}
             </View>
             <View style={{ width: "100%", height: "10%" }}>
-              <C_Footer LeftIconName={"ios-options"} LeftIconColor={"transparent"} LeftIconSize={26} CenterIconName={"ios-radio-button-on"} CenterIconColor={"white"} CenterIconSize={65} CenterOnPress={this.takePicture.bind(this)} RightIconName={"ios-reverse-camera"} RightIconColor={"white"} RightIconSize={34} RightOnPress={this.toggleFacing.bind(this)} />
+              <C_Footer MicIcon={"ios-mic"} ASL_ISL_Icon={"ASL"} LeftIconName={"ios-options"} LeftIconColor={"transparent"} LeftIconSize={26} CenterIconName={"ios-radio-button-on"} CenterIconColor={"white"} CenterIconSize={65} CenterOnPress={this.takePicture.bind(this)} RightIconName={"ios-reverse-camera"} RightIconColor={"white"} RightIconSize={34} RightOnPress={this.toggleFacing.bind(this)} />
             </View>
           </View>
         </CameraContext.Provider>

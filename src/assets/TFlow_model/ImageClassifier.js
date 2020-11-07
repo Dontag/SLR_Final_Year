@@ -54,13 +54,13 @@ const imageClassifier = (props) => {
 
       });
 
-    console.log("Mai pagal hua", ResultData.ResultState);
+    console.log("Results", ResultData.ResultState);
     tflite.close();
     return ResultData.ResultState;
   }
   else {
     tflite.close();
-    return "this is new Datas";
+    return "No Data Yet";
   }
 
 
