@@ -70,7 +70,7 @@ class History extends Component {
                         <View style={styles.container}>
                             <View style={styles.containerInner}>
                                 <TouchableOpacity activeOpacity={0.9} onPress={() => { this.nowAnimate(item.ID) }} >
-                                    <Animated.View key={item.ID} style={[card, item.ID == this._Index ? animatedStyle : { height: 150 }]}>
+                                    <Animated.View key={item.ID} style={[styles.card, item.ID === this._Index ? animatedStyle : { height: this.state.animationValue }]}>
                                         <View style={styles.cardTopContent}>
                                             <Text style={styles.cardTextPlace}>PLACE: {item.Place}</Text>
                                             <Text style={styles.cardTextDate}>DATE: {item.Date}</Text>

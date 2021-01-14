@@ -28,7 +28,21 @@ class C_Footer extends Component {
     }
 
     render() {
-        const { ASL_ISL_Icon, MicIcon, LeftIconName, LeftIconSize, LeftIconColor, LeftOnPress, CenterIconName, CenterIconSize, CenterIconColor, CenterOnPress, RightIconName, RightIconSize, RightIconColor, RightOnPress } = this.props
+        let { ASL_ISL_Icon,
+            MicIcon,
+            LeftIconName,
+            LeftIconSize,
+            LeftIconColor,
+            LeftOnPress,
+            CenterLeftOnPress,
+            CenterIconName,
+            CenterIconSize,
+            CenterIconColor,
+            CenterOnPress,
+            RightIconName,
+            RightIconSize,
+            RightIconColor,
+            RightOnPress } = this.props
         return (
             <View style={styles.Camera_S_Footer_Main_View}>
                 <View style={{ justifyContent: "center", alignItems: "center", marginLeft: 25, padding: 10 }} >
@@ -36,7 +50,7 @@ class C_Footer extends Component {
                 </View>
                 <View style={styles.Camera_S_Footer_Eye_View} >
                     <View style={styles.ASL_Left_Icon_Press}>
-                        <Icon name={MicIcon} size={RightIconSize} color={RightIconColor} onPress={RightOnPress} />
+                        <Icon name={MicIcon} size={RightIconSize} color={RightIconColor} onPress={CenterLeftOnPress} />
                     </View>
                     <View style={styles.Camera_S_Footer_Center_Element_View}>
                         <Icon name={CenterIconName} size={CenterIconSize} color={CenterIconColor} onPress={CenterOnPress} />

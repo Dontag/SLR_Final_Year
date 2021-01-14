@@ -43,6 +43,7 @@ class Camera_S extends PureComponent {
     classificationResult: ''
   };
 
+
   imageClassifier = (data) => {
     tflite.loadModel({
       model: 'models/imageClassifier_M.tflite',// required
@@ -110,9 +111,9 @@ class Camera_S extends PureComponent {
       const options = { quality: 0.8, base64: true };
       //  const data = await this.camera.takePictureAsync(options);
       const data = await this.camera.takePictureAsync(options);
-      console.log(data.uri);
+      console.log(`data:image/png;base64,${data.uri}`);
       console.log(this.state.boolFlag, "bool");
-
+      this.getPostImageData(`data:image/png;base64,${data.base64}`);
       this.setState({
         boolFlag: boolFlagvar,
         snapData: data.uri,
@@ -120,6 +121,38 @@ class Camera_S extends PureComponent {
       this.imageClassifier(data.uri);
     }
 
+  }
+
+  getPostImageData = async (imageData) => {
+    // try {
+    //   const ImageData = await fetch('http://192.168.1.11:5000/1020', {
+    //     method: "GET",
+    //   });
+    //   const responseData = await ImageData.json();
+    //   console.log('imageData-----', responseData)
+    //   console.log(ImageData, 'imageDataPostBody')
+    // } catch (err) {
+    //   console.log("Error fetching data-----------", err);
+    // }
+
+    const bodyData = new FormData();
+    bodyData.append('_id', String(10003));
+    bodyData.append('image_data', String(imageData));
+    try {
+      const ImageData = await fetch('http://192.168.1.11:5000/', {
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'multipart/form-data',
+        },
+        body: bodyData
+      });
+      const responseData = await ImageData.json();
+      console.log('imageData-----', responseData)
+      console.log(ImageData, 'imageDataPostBody')
+    } catch (err) {
+      console.log("Error fetching data-----------", err);
+    }
   }
 
   takeVideo = async () => {
@@ -195,6 +228,7 @@ class Camera_S extends PureComponent {
             LeftIconName={"ios-options"}
             LeftIconColor={"white"}
             LeftIconSize={26}
+            LeftOnPress={() => { this.getPostImageData() }}
             CenterIconName={"ios-radio-button-on"}
             CenterIconColor={"white"}
             CenterIconSize={65}
