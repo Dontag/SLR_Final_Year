@@ -108,12 +108,13 @@ class Camera_S extends PureComponent {
   takePicture = async () => {
     let boolFlagvar = !this.state.boolFlag;
     if (this.camera) {
-      const options = { quality: 0.8, base64: true };
+      const options = { quality: 0.5, base64: true, orientation: RNCamera.Constants.ORIENTATION_UP,  fixOrientation: true, };
       //  const data = await this.camera.takePictureAsync(options);
       const data = await this.camera.takePictureAsync(options);
       console.log(`data:image/png;base64,${data.uri}`);
       console.log(this.state.boolFlag, "bool");
-      this.getPostImageData(`data:image/png;base64,${data.base64}`);
+      this.getPostImageData(data.base64);
+      // this.getPostImageData(`data:image/png;base64,${data.base64}`);
       this.setState({
         boolFlag: boolFlagvar,
         snapData: data.uri,
@@ -125,7 +126,7 @@ class Camera_S extends PureComponent {
 
   getPostImageData = async (imageData) => {
     // try {
-    //   const ImageData = await fetch('http://192.168.1.11:5000/1020', {
+    //   const ImageData = await fetch('http://192.168.1.5:5000/1020', {
     //     method: "GET",
     //   });
     //   const responseData = await ImageData.json();
@@ -139,7 +140,7 @@ class Camera_S extends PureComponent {
     bodyData.append('_id', String(10003));
     bodyData.append('image_data', String(imageData));
     try {
-      const ImageData = await fetch('http://192.168.1.11:5000/', {
+      const ImageData = await fetch('http://192.168.1.5:5000/', {
         method: "POST",
         headers: {
           'Accept': 'application/json',
