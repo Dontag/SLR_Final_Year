@@ -132,7 +132,7 @@ class Camera_S extends PureComponent {
   enableVoice = () => {
     let Data = "";
     if (this.state.voiceOnOff === true) {
-      Data = "ios-volume-mute"
+      Data = "ios-volume-off"
       ToastAndroid.show("Voice Off", ToastAndroid.SHORT)
     }
     else {
