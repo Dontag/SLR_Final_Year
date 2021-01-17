@@ -8,6 +8,7 @@ import {
 import { RNCamera } from 'react-native-camera';
 import Tflite from 'tflite-react-native';
 import auth from '@react-native-firebase/auth'
+import database from '@react-native-firebase/database';
 
 //Styles
 import { styles } from './assets/styles/styles';
@@ -46,7 +47,7 @@ class Camera_S extends PureComponent {
     Icon_ASL_ISL: "ASL",
     setAutomation: false,
     setAutomationIcon: "ios-eye-off",
-    ASL_ISL_IconAccess: true
+    ASL_ISL_IconAccess: true,
   };
 
   componentDidMount() {
@@ -54,7 +55,7 @@ class Camera_S extends PureComponent {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       StatusBar.setHidden(true);
     });
-    this.__subscribe = auth().onAuthStateChanged(async (User) => {
+    this.__subscribe = auth().onAuthStateChanged((User) => {
       if (User) {
         console.log("User already Anonymously Logged In")
       }
@@ -77,6 +78,7 @@ class Camera_S extends PureComponent {
     // StatusBar.setHidden(false);
     this._unsubscribe();
     this.__subscribe();
+
   }
 
 
@@ -205,17 +207,6 @@ class Camera_S extends PureComponent {
   }
 
   getPostImageData = async (imageData) => {
-    // try {
-    //   const ImageData = await fetch('http://192.168.1.5:5000/1020', {
-    //     method: "GET",
-    //   });
-    //   const responseData = await ImageData.json();
-    //   console.log('imageData-----', responseData)
-    //   console.log(ImageData, 'imageDataPostBody')
-    // } catch (err) {
-    //   console.log("Error fetching data-----------", err);
-    // }
-
     const bodyData = new FormData();
     bodyData.append('_id', String(10003));
     bodyData.append('image_data', String(imageData));
@@ -236,22 +227,6 @@ class Camera_S extends PureComponent {
     }
   }
 
-  takeVideo = async () => {
-    const { isRecording } = this.state;
-    if (this.camera && !isRecording) {
-      try {
-        const promise = this.camera.recordAsync(this.state.recordOptions);
-        if (promise) {
-          this.setState({ isRecording: true });
-          const data = await promise;
-          console.warn('takeVideo', data);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  };
-
   deleteClassificationData = () => {
     this.setState({ classificationResult: '' })
   }
@@ -259,7 +234,35 @@ class Camera_S extends PureComponent {
   toggle = value => () =>
     this.setState(prevState => ({ [value]: !prevState[value] }));
 
+  // Firebase Config
 
+  send = async () => {
+    let { classificationResult } = this.state;
+    if (classificationResult != '') {
+
+      let { classificationResult } = this.state;
+      const message = {
+        text: classificationResult,
+        timestamp: database.ServerValue.TIMESTAMP,
+        user_id: "1111",
+        place: "Bhusawal"
+      }
+      this.db.push(message)
+      this.deleteClassificationData();
+    }
+  };
+
+  off() {
+    this.db.off()
+  }
+
+  get db() {
+    const path = "1111";
+    //const path = "messages/";
+    return (database().ref(`history/${path}`))
+  }
+
+  //render Camera
   renderCamera() {
     let { classificationResult } = this.state;
     return (
@@ -304,7 +307,7 @@ class Camera_S extends PureComponent {
         <View style={{ width: width }}>
           <GTT_C_S
             classificationData={classificationResult}
-            onPress={() => { this.deleteClassificationData() }}
+            onPress={() => { this.send() }}
             automation={this.state.setAutomation}
           />
           <C_Footer
