@@ -3,14 +3,18 @@ import {
     View,
     Text,
     ScrollView,
-    TouchableOpacity
+    TouchableOpacity,
+    ToastAndroid
 } from 'react-native';
 import { styles } from '../assets/styles/styles';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 class GTT_Camera_C extends Component {
     render() {
-        let { classificationData, onPress } = this.props;
+        let { classificationData, onPress, automation } = this.props;
+        if (automation && classificationData != '') {
+            ToastAndroid.show(classificationData, ToastAndroid.SHORT);
+        }
         return (
             <View style={styles.GTT_Main_View}>
                 <View style={styles.GTT_Main_Inner_View}>

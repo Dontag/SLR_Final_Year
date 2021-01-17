@@ -29,12 +29,13 @@ class C_Footer extends Component {
             RightIconSize,
             RightIconColor,
             ASL_ISL_onPress,
+            ASL_ISL_IconAccess,
             Icon_ASL_ISL,
             RightOnPress } = this.props
         return (
             <View style={styles.Camera_S_Footer_Main_View}>
-                <View style={{ justifyContent: "center", alignItems: "center", marginLeft: 25, padding: 10 }} >
-                    <Icon name={LeftIconName} size={LeftIconSize} color={LeftIconColor} onPress={LeftOnPress} />
+                <View style={{ justifyContent: "center", alignItems: "center", marginLeft: 25 }} >
+                    <Icon style={{ padding: 10 }} name={LeftIconName} size={LeftIconSize} color={LeftIconColor} onPress={LeftOnPress} />
                 </View>
                 <View style={styles.Camera_S_Footer_Eye_View} >
                     <View style={styles.ASL_Left_Icon_Press}>
@@ -44,15 +45,20 @@ class C_Footer extends Component {
                         <Icon name={CenterIconName} size={CenterIconSize} color={CenterIconColor} onPress={CenterOnPress} />
                     </View>
                     <View style={styles.ASL_ISL_Icon_View}>
-                        <TouchableOpacity onPress={ASL_ISL_onPress}>
+                        {ASL_ISL_IconAccess ? <TouchableOpacity onPress={ASL_ISL_onPress}>
                             <Text style={styles.ASL_ISL_Text}>
                                 {Icon_ASL_ISL}
                             </Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> :
+                            <View onPress={ASL_ISL_onPress}>
+                                <Text style={styles.ASL_ISL_Text}>
+                                    {Icon_ASL_ISL}
+                                </Text>
+                            </View>}
                     </View>
                 </View>
-                <View style={{ justifyContent: "center", alignItems: "center", marginRight: 25, padding: 10 }}>
-                    <Icon name={RightIconName} size={RightIconSize} color={RightIconColor} onPress={RightOnPress} />
+                <View style={{ justifyContent: "center", alignItems: "center", marginRight: 25 }}>
+                    <Icon style={{ padding: 10 }} name={RightIconName} size={RightIconSize} color={RightIconColor} onPress={RightOnPress} />
                 </View>
             </View>
         );

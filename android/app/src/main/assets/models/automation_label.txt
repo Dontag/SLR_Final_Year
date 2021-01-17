@@ -1,0 +1,4 @@
+Device Off
+Light On
+Fan On
+TV On

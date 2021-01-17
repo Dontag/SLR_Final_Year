@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import Tflite from 'tflite-react-native';
+import auth from '@react-native-firebase/auth'
 
 //Styles
 import { styles } from './assets/styles/styles';
@@ -42,7 +43,10 @@ class Camera_S extends PureComponent {
     flag: 1,
     boolFlag: false,
     classificationResult: '',
-    Icon_ASL_ISL: "ASL"
+    Icon_ASL_ISL: "ASL",
+    setAutomation: false,
+    setAutomationIcon: "ios-eye-off",
+    ASL_ISL_IconAccess: true
   };
 
   componentDidMount() {
@@ -50,11 +54,54 @@ class Camera_S extends PureComponent {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       StatusBar.setHidden(true);
     });
+    this.__subscribe = auth().onAuthStateChanged(async (User) => {
+      if (User) {
+        console.log("User already Anonymously Logged In")
+      }
+      else {
+        auth().signInAnonymously()
+          .then(() => {
+            console.log("User Logged In")
+          })
+          .catch(error => {
+            if (error.code === 'auth/operation-not-allowed') {
+              console.log('Enable anonymous in your firebase console.');
+            }
+            console.error(error);
+          })
+      }
+    })
   }
 
   componentWillUnmount() {
     // StatusBar.setHidden(false);
     this._unsubscribe();
+    this.__subscribe();
+  }
+
+
+  setAutomation = () => {
+    let { setAutomation } = this.state;
+    let icon_name = ""
+    let setAccess = null
+    let setAutomationbol = false
+    if (!setAutomation) {
+      icon_name = "ios-eye"
+      setAccess = false
+      setAutomationbol = true
+    }
+    else {
+      icon_name = "ios-eye-off"
+      setAccess = true
+      setAutomationbol = false
+    }
+    this.setState({
+      setAutomation: setAutomationbol,
+      setAutomationIcon: icon_name,
+      Icon_ASL_ISL: "ASL",
+      ASL_ISL_IconAccess: setAccess,
+      classificationResult: ''
+    })
   }
 
   onChange = () => {
@@ -72,8 +119,12 @@ class Camera_S extends PureComponent {
 
 
   imageClassifier = (data) => {
-    let modelName = this.state.Icon_ASL_ISL === "ASL" ? 'models/asl_modal.tflite' : 'models/imageClassifier_M.tflite';
-    let modelLabels = this.state.Icon_ASL_ISL === "ASL" ? 'models/labels_asl.txt' : 'models/labels_2.txt';
+    let modelName = !this.state.setAutomation ?
+      this.state.Icon_ASL_ISL === "ASL" ? 'models/asl_modal.tflite' :
+        'models/imageClassifier_M.tflite' : "models/automation_model.tflite";
+    let modelLabels = !this.state.setAutomation ?
+      this.state.Icon_ASL_ISL === "ASL" ? 'models/labels_asl.txt' :
+        'models/labels_2.txt' : "models/automation_label.txt";
     tflite.loadModel({
       model: modelName,// required
       labels: modelLabels,  // required
@@ -99,7 +150,7 @@ class Camera_S extends PureComponent {
           console.log('Result 1---->', res);
           res.map((labeldata) => {
             this.setState((prevState) => ({
-              classificationResult: prevState.classificationResult + labeldata.label,
+              classificationResult: !this.state.setAutomation ? prevState.classificationResult + labeldata.label : labeldata.label,
             }))
           })
         }
@@ -254,14 +305,15 @@ class Camera_S extends PureComponent {
           <GTT_C_S
             classificationData={classificationResult}
             onPress={() => { this.deleteClassificationData() }}
+            automation={this.state.setAutomation}
           />
           <C_Footer
             MicIcon={"ios-mic"}
             ASL_ISL_Icon={"ASL"}
-            LeftIconName={"ios-options"}
+            LeftIconName={this.state.setAutomationIcon}
             LeftIconColor={"white"}
             LeftIconSize={26}
-            LeftOnPress={() => { this.getPostImageData() }}
+            LeftOnPress={() => { this.setAutomation() }}
             CenterIconName={"ios-radio-button-on"}
             CenterIconColor={"white"}
             CenterIconSize={65}
@@ -269,6 +321,7 @@ class Camera_S extends PureComponent {
             RightIconName={"ios-reverse-camera"}
             RightIconColor={"white"}
             RightIconSize={34}
+            ASL_ISL_IconAccess={this.state.ASL_ISL_IconAccess}
             ASL_ISL_onPress={() => { this.onChange() }}
             Icon_ASL_ISL={this.state.Icon_ASL_ISL}
             RightOnPress={this.toggleFacing.bind(this)} />
