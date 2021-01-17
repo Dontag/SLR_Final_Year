@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "270773588667",
+    "project_id": "slirecognition",
+    "storage_bucket": "slirecognition.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:270773588667:android:2dea560fc44cd638e04f9e",
+        "android_client_info": {
+          "package_name": "com.slr_sign_language"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "270773588667-e8e8bketv03tucmln9r3tqjpb9kj3l83.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.slr_sign_language",
+            "certificate_hash": "9c929a691dcde83a661a9c0378900f47a55da834"
+          }
+        },
+        {
+          "client_id": "270773588667-hru2b940eanq9ap1l68uprkakvsgbieb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQPSkzH8MEBdbrUQaib6YAcEDcx_7N6ZU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "270773588667-hru2b940eanq9ap1l68uprkakvsgbieb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
