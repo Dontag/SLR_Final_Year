@@ -16,11 +16,39 @@ export const styles = StyleSheet.create({
     backgroundColor: 'blue',
   },
   Camera_S_faces_Barcode_Container: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    left: 0,
-    top: 0,
+    // position: 'absolute',
+    // bottom: 0,
+    // right: 0,
+    // left: 0,
+    // top: 0,
+  },
+  __tpModal: {
+
+  },
+  __tpModalView: {
+    borderRadius: 20,
+    backgroundColor: "#297ca3",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  __tpModalButton: {
+    marginVertical: 20,
+    borderRadius: 30,
+    padding: 10,
+    elevation: 5,
+    width: width - 60,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#5f8ea3"
+  },
+  __tpModalButtonText: {
+    color: "#fff",
+    fontSize: 16
+  },
+  __tpModalIcon: {
+    marginTop: 10,
+    marginBottom: 5,
+    padding: 5
   },
 
   //Camera Header Component

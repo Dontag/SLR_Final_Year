@@ -3,12 +3,18 @@ import {
   View,
   StatusBar,
   Dimensions,
-  ToastAndroid
+  ToastAndroid,
+  Text,
+  TouchableOpacity
 } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import Tflite from 'tflite-react-native';
 import auth from '@react-native-firebase/auth'
 import database from '@react-native-firebase/database';
+import RNFS from 'react-native-fs';
+import Tts from 'react-native-tts';
+import Modal from 'react-native-modal';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 //Styles
 import { styles } from './assets/styles/styles';
@@ -17,6 +23,7 @@ import { styles } from './assets/styles/styles';
 import C_Header from './components/Camera_Header';
 import C_Footer from './components/Camera_Footer';
 import GTT_C_S from './components/GTT_Camera_C';
+
 
 let tflite = new Tflite();
 const { height, width } = Dimensions.get('window');
@@ -48,6 +55,9 @@ class Camera_S extends PureComponent {
     setAutomation: false,
     setAutomationIcon: "ios-eye-off",
     ASL_ISL_IconAccess: true,
+    spicIcon: "ios-volume-high",
+    voiceOnOff: true,
+    isModalVisible: false
   };
 
   componentDidMount() {
@@ -119,6 +129,18 @@ class Camera_S extends PureComponent {
     this.setState({ Icon_ASL_ISL: Data })
   }
 
+  enableVoice = () => {
+    let Data = "";
+    if (this.state.voiceOnOff === true) {
+      Data = "ios-volume-mute"
+      ToastAndroid.show("Voice Off", ToastAndroid.SHORT)
+    }
+    else {
+      Data = "ios-volume-high"
+      ToastAndroid.show("Voice On", ToastAndroid.SHORT)
+    }
+    this.setState({ spicIcon: Data, voiceOnOff: this.state.voiceOnOff === true ? false : true })
+  }
 
   imageClassifier = (data) => {
     let modelName = !this.state.setAutomation ?
@@ -150,11 +172,17 @@ class Camera_S extends PureComponent {
           console.log('Something went Wrong 1---->', err);
         } else {
           console.log('Result 1---->', res);
+          let label = '';
           res.map((labeldata) => {
             this.setState((prevState) => ({
               classificationResult: !this.state.setAutomation ? prevState.classificationResult + labeldata.label : labeldata.label,
             }))
+            label = labeldata.label
           })
+          {
+            this.state.voiceOnOff ? Tts.speak(`${label}`) : null
+          }
+          RNFS.unlink(data);
         }
       });
     tflite.close();
@@ -262,6 +290,42 @@ class Camera_S extends PureComponent {
     return (database().ref(`history/${path}`))
   }
 
+  onTpModalPress = () => {
+    this.props.navigation.navigate("TextToGesture")
+    this.setState({ isModalVisible: false })
+  }
+
+  //RenderModal
+  renderTPModal = () => {
+    let { isModalVisible } = this.state;
+    return (
+      <View>
+        <Modal
+          isVisible={isModalVisible}
+          backdropOpacity={0.8}
+          animationIn={"slideInUp"}
+          style={styles.__tpModal}
+          animationOut={"slideOutDown"}
+          animationInTiming={600}
+          animationOutTiming={600}
+          backdropTransitionInTiming={600}
+          backdropTransitionOutTiming={600}
+          swipeDirection={['down']}
+          onSwipeComplete={() => { this.setState({ isModalVisible: false }) }}
+        >
+          <View style={styles.__tpModalView}>
+            <TouchableOpacity onPress={() => { this.onTpModalPress() }} style={styles.__tpModalButton}>
+              <Text style={styles.__tpModalButtonText}>
+                Text To Gesture
+              </Text>
+            </TouchableOpacity>
+            <Icon onPress={() => { this.setState({ isModalVisible: false }) }} style={styles.__tpModalIcon} name={"ios-arrow-up"} size={26} color={"#ffffff"} />
+          </View>
+        </Modal>
+      </View>
+    )
+  }
+
   //render Camera
   renderCamera() {
     let { classificationResult } = this.state;
@@ -297,6 +361,7 @@ class Camera_S extends PureComponent {
             CenterIconName={"ios-arrow-down"}
             CenterIconSize={34}
             CenterIconColor={"white"}
+            CenterOnPress={() => { this.setState({ isModalVisible: true }) }}
             CenterTextName={"Gesture To Text"}
             CenterTextColor={"white"}
             RightIconName={this.state.flashIcon}
@@ -311,7 +376,7 @@ class Camera_S extends PureComponent {
             automation={this.state.setAutomation}
           />
           <C_Footer
-            MicIcon={"ios-mic"}
+            spicIcon={this.state.spicIcon}
             ASL_ISL_Icon={"ASL"}
             LeftIconName={this.state.setAutomationIcon}
             LeftIconColor={"white"}
@@ -320,6 +385,7 @@ class Camera_S extends PureComponent {
             CenterIconName={"ios-radio-button-on"}
             CenterIconColor={"white"}
             CenterIconSize={65}
+            CenterLeftOnPress={() => { this.enableVoice() }}
             CenterOnPress={this.takePicture.bind(this)}
             RightIconName={"ios-reverse-camera"}
             RightIconColor={"white"}
@@ -337,6 +403,7 @@ class Camera_S extends PureComponent {
     return (
       <View style={styles.Camera_S_Container_View}>
         {/* <StatusBar hidden={true} /> */}
+        {this.renderTPModal()}
         {this.renderCamera()}
       </View>);
   }

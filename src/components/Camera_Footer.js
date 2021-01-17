@@ -15,7 +15,7 @@ class C_Footer extends Component {
 
     render() {
         let { ASL_ISL_Icon,
-            MicIcon,
+            spicIcon,
             LeftIconName,
             LeftIconSize,
             LeftIconColor,
@@ -39,7 +39,7 @@ class C_Footer extends Component {
                 </View>
                 <View style={styles.Camera_S_Footer_Eye_View} >
                     <View style={styles.ASL_Left_Icon_Press}>
-                        <Icon name={MicIcon} size={RightIconSize} color={RightIconColor} onPress={CenterLeftOnPress} />
+                        <Icon name={spicIcon} size={RightIconSize} color={RightIconColor} onPress={CenterLeftOnPress} />
                     </View>
                     <View style={styles.Camera_S_Footer_Center_Element_View}>
                         <Icon name={CenterIconName} size={CenterIconSize} color={CenterIconColor} onPress={CenterOnPress} />
