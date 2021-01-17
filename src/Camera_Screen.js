@@ -45,6 +45,17 @@ class Camera_S extends PureComponent {
     Icon_ASL_ISL: "ASL"
   };
 
+  componentDidMount() {
+    StatusBar.setHidden(true);
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      StatusBar.setHidden(true);
+    });
+  }
+
+  componentWillUnmount() {
+    // StatusBar.setHidden(false);
+    this._unsubscribe();
+  }
 
   onChange = () => {
     let Data = "";
@@ -269,7 +280,7 @@ class Camera_S extends PureComponent {
   render() {
     return (
       <View style={styles.Camera_S_Container_View}>
-        <StatusBar hidden={true} />
+        {/* <StatusBar hidden={true} /> */}
         {this.renderCamera()}
       </View>);
   }

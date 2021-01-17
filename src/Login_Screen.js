@@ -6,131 +6,150 @@ import {
   TextInput,
   TouchableOpacity,
   Linking,
+  StatusBar,
+  Dimensions
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+//Component
 
+import CommonHeader from './components/CommonHeader';
+
+let { height, width } = Dimensions.get('window');
 class Login_S extends React.Component {
+
+  componentDidMount() {
+    StatusBar.setHidden(false);
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      StatusBar.setHidden(false);
+    });
+  }
+
+  componentWillUnmount() {
+    // StatusBar.setHidden(false);
+    this._unsubscribe();
+  }
   render() {
     return (
-      <View style={styles.regform}>
-        <Text style={styles.header}>Login</Text>
-        <Text style={styles.Content}> Username</Text>
-        <TextInput style={styles.inputBox}
-          placeholder={"Enter Username"}
-          underlineColorAndroid='rgba(0,0,0,0)' />
-        <Text style={styles.Content}> Password</Text>
-        <TextInput style={styles.inputBox}
-          placeholder={"Enter Password"}
-          underlineColorAndroid='rgba(0,0,0,0)' />
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.btntext}>Sign In</Text>
-        </TouchableOpacity>
-        <Text style={styles.Content1}>Forgot Your Password?</Text>
-
-
-        <View style={{ flexDirection: 'row', alignItems: "center", justifyContent: "space-around", height: 200 }}>
-          <View style={{ width: "50%", alignItems: "center", justifyContent: "center" }}>
-            <TouchableOpacity style={styles.Icon1} onPress={() => Linking.openURL('https://gmail.com')}>
-              <Icon name="logo-google" size={30} color='#3264A1' />
-
+      <View style={styles.__container}>
+        <StatusBar backgroundColor={"#43aeba"} hidden={false} barStyle={'dark-content'} />
+        <CommonHeader
+          title={"Login"}
+          onPress={() => { this.props.navigation.goBack() }}
+        />
+        <View style={styles.__containerContent}>
+          <Text style={styles.__contentTitle}>
+            recog-sign
+          </Text>
+          <View style={styles.__loginContent}>
+            <View style={styles.__inputContainer}>
+              <Text style={styles.__inputTitle}> Username</Text>
+              <TextInput style={styles.__inputBox}
+                placeholder={"Enter Username"}
+                underlineColorAndroid='rgba(0,0,0,0)' />
+            </View>
+            <View style={[styles.__inputContainer, { marginTop: 20 }]}>
+              <Text style={styles.__inputTitle}> Password</Text>
+              <TextInput style={styles.__inputBox}
+                placeholder={"Enter Password"}
+                underlineColorAndroid='rgba(0,0,0,0)' />
+            </View>
+            <TouchableOpacity style={styles.__inputSubmitButton}>
+              <Text style={styles.__inputSubmitButtonText}>Sign In</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.__inputForgotButton}>
+              <Text style={styles.__inputForgotButtonText}>Forgot Your Password?</Text>
             </TouchableOpacity>
           </View>
-          <View style={{ width: "50%", alignItems: "center", justifyContent: "center" }}>
-            <TouchableOpacity style={styles.Icon2} onPress={() => Linking.openURL('https://facebook.com')}>
+          <View style={styles.__loginBottomContents}>
+            <TouchableOpacity style={styles.__loginBottomButtonView} onPress={() => Linking.openURL('https://gmail.com')}>
+              <Icon name="logo-google" size={30} color='#3264A1' />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.__loginBottomButtonView} onPress={() => Linking.openURL('https://facebook.com')}>
               <Icon name="logo-facebook" size={30} color='#3264A1' />
             </TouchableOpacity>
           </View>
         </View>
-
       </View>
-
-
-
     );
   }
 }
 
 const styles = StyleSheet.create({
-  regform: {
+  __container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
     backgroundColor: "#4f8bb3"
   },
-  header:
-  {
-    alignSelf: 'center',
-    fontSize: 35,
-    color: '#FFFFFF',
-    paddingBottom: 30,
+  __contentTitle: {
+    textTransform: "uppercase",
+    alignSelf: "center",
+    fontSize: 22,
+    color: "#143147"
   },
-  inputBox: {
-
-    width: 250,
-    height: 45,
-    borderRadius: 25,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 16,
-    marginVertical: 25,
+  __containerContent: {
+    marginVertical: 20,
+    width: width,
+    justifyContent: "center"
+  },
+  __loginContent: {
+    marginVertical: 30,
+    width: width - 20,
+    borderRadius: 10,
+    backgroundColor: "#ffffff",
+    paddingVertical: 15,
+    justifyContent: "center",
+    alignSelf: "center"
+  },
+  __inputContainer: {
+    paddingHorizontal: 10
+  },
+  __inputTitle: {
     fontSize: 16,
-
-
+    color: "#2c6d9c",
+    paddingVertical: 4
   },
-  button:
-  {
-
-    alignItems: 'center',
-    padding: 15,
-    width: 150,
-    height: 46,
+  __inputBox: {
     borderRadius: 30,
-    backgroundColor: '#3264A1',
+    elevation: 5,
+    backgroundColor: "#e1edf5",
+    paddingHorizontal: 20
   },
-  btntext:
-  {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  Content:
-  {
-    marginTop: 10,
-    fontSize: 20,
-    color: '#FFFFFF',
-    padding: 2,
-
-  },
-  Content1:
-  {
-    fontSize: 18,
-    color: '#000000',
+  __inputSubmitButton: {
+    marginTop: 40,
+    marginBottom: 10,
+    alignSelf: "center",
+    borderRadius: 30,
+    width: width / 2,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#4f8bb3",
     padding: 10,
-
+    elevation: 10
   },
-  Icon1:
-  {
-    justifyContent: 'space-around',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 2,
-    overflow: "hidden",
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#FFFFFF',
+  __inputSubmitButtonText: {
+    color: "#ffffff",
+    fontSize: 16
   },
-
-
-  Icon2:
-  {
-    justifyContent: 'space-around',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-    backgroundColor: '#FFFFFF',
-    overflow: "hidden",
-    alignItems: 'center',
+  __inputForgotButton: {
+    alignSelf: "center"
+  },
+  __inputForgotButtonText: {
+    color: "#728b9e"
+  },
+  __loginBottomContents: {
+    justifyContent: "space-around",
+    alignItems: "center",
+    marginHorizontal: 30,
+    marginVertical: 30,
+    flexDirection: "row"
+  },
+  __loginBottomButtonView: {
+    borderRadius: 50,
+    width: width * 2 / 15,
+    height: width * 2 / 15,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#ffffff",
+    elevation: 5
   },
 });
 
