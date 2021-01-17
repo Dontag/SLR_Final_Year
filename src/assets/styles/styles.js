@@ -50,7 +50,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(49, 128, 185,0.8)",
   },
   Camera_S_Footer_Eye_View: {
-    width: width / 2.5,
+    width: width / 2.4,
     justifyContent: "space-around",
     alignContent: "center",
     alignItems: "center",
@@ -71,7 +71,6 @@ export const styles = StyleSheet.create({
     height: height / 8,
     backgroundColor: "rgba(49, 128, 185,0.8)",
     justifyContent: "center",
-    alignItems: "center",
     borderBottomColor: "#c1c5c9",
     borderBottomWidth: 0.20,
     borderTopLeftRadius: 10,
@@ -79,27 +78,37 @@ export const styles = StyleSheet.create({
 
   },
   GTT_Main_Inner_View: {
-    width: "90%",
-    height: "80%",
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    width: width - 15,
+    height: 80,
+    backgroundColor: "rgba(255, 255, 255, 0.6)",
     justifyContent: "center",
-    alignItems: "center",
     borderBottomColor: "#c1c5c9",
+    alignSelf: "center",
     borderBottomWidth: 0.20,
-    borderRadius: 25
+    borderRadius: 20,
+    flexDirection: "row"
   },
   GTT_Scroll_View: {
-    width: "93%",
-    height: "100%"
+    width: width - 15,
   },
   GTT_Scroll_View_Text: {
     fontSize: 18,
     fontWeight: "100",
     color: "rgb(65, 132, 176)",
-    width: "100%",
-    height: "100%",
     padding: "2%",
 
+  },
+  GTT_Trash: {
+    backgroundColor: "rgba(0, 51, 64,0.9)",
+    justifyContent: "center",
+    paddingHorizontal: 10,
+    borderTopRightRadius: 20,
+    borderBottomRightRadius: 20
+  },
+  GTT_Main_InnerScroll: {
+    justifyContent: "space-between",
+    flexDirection: "row",
+    flex: 1
   },
 
   ASL_ISL_Icon_View: {
@@ -107,6 +116,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     borderRadius: 50,
+    width: 33,
   },
   ASL_ISL_Text: {
     fontSize: 18,
@@ -117,6 +127,6 @@ export const styles = StyleSheet.create({
   ASL_Left_Icon_Press: {
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 10
+    marginLeft: 12
   }
 });

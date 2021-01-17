@@ -12,20 +12,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 
 class C_Footer extends Component {
-    state = {
-        Icon_ASL_ISL: "ASL"
-    }
-
-    onChange = () => {
-        let Data = "";
-        if (this.state.Icon_ASL_ISL == "ASL") {
-            Data = "ISL"
-        }
-        else {
-            Data = "ASL"
-        }
-        this.setState({ Icon_ASL_ISL: Data })
-    }
 
     render() {
         let { ASL_ISL_Icon,
@@ -42,6 +28,8 @@ class C_Footer extends Component {
             RightIconName,
             RightIconSize,
             RightIconColor,
+            ASL_ISL_onPress,
+            Icon_ASL_ISL,
             RightOnPress } = this.props
         return (
             <View style={styles.Camera_S_Footer_Main_View}>
@@ -56,9 +44,9 @@ class C_Footer extends Component {
                         <Icon name={CenterIconName} size={CenterIconSize} color={CenterIconColor} onPress={CenterOnPress} />
                     </View>
                     <View style={styles.ASL_ISL_Icon_View}>
-                        <TouchableOpacity onPress={() => this.onChange()}>
+                        <TouchableOpacity onPress={ASL_ISL_onPress}>
                             <Text style={styles.ASL_ISL_Text}>
-                                {this.state.Icon_ASL_ISL}
+                                {Icon_ASL_ISL}
                             </Text>
                         </TouchableOpacity>
                     </View>

@@ -2,7 +2,8 @@ import React, { PureComponent } from 'react';
 import {
   View,
   StatusBar,
-  Dimensions
+  Dimensions,
+  ToastAndroid
 } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import Tflite from 'tflite-react-native';
@@ -40,14 +41,31 @@ class Camera_S extends PureComponent {
     snapData: '',
     flag: 1,
     boolFlag: false,
-    classificationResult: ''
+    classificationResult: '',
+    Icon_ASL_ISL: "ASL"
   };
 
 
+  onChange = () => {
+    let Data = "";
+    if (this.state.Icon_ASL_ISL == "ASL") {
+      Data = "ISL"
+      ToastAndroid.show("ISL Selected", ToastAndroid.SHORT)
+    }
+    else {
+      Data = "ASL"
+      ToastAndroid.show("ASL Selected", ToastAndroid.SHORT)
+    }
+    this.setState({ Icon_ASL_ISL: Data })
+  }
+
+
   imageClassifier = (data) => {
+    let modelName = this.state.Icon_ASL_ISL === "ASL" ? 'models/asl_modal.tflite' : 'models/imageClassifier_M.tflite';
+    let modelLabels = this.state.Icon_ASL_ISL === "ASL" ? 'models/labels_asl.txt' : 'models/labels_2.txt';
     tflite.loadModel({
-      model: 'models/imageClassifier_M.tflite',// required
-      labels: 'models/labels_2.txt',  // required
+      model: modelName,// required
+      labels: modelLabels,  // required
       numThreads: 1,                              // defaults to 1
     },
       (err, res) => {
@@ -86,15 +104,15 @@ class Camera_S extends PureComponent {
 
   toggleFlash() {
     if (this.state.flash === 'off') {
-      this.state.flash = 'torch'
       this.state.flashIcon = 'ios-flash'
+      ToastAndroid.show("Flash ON", ToastAndroid.SHORT)
     }
     else {
-      this.state.flash = 'off'
       this.state.flashIcon = 'ios-flash-off'
+      ToastAndroid.show("Flash OFF", ToastAndroid.SHORT)
     }
     this.setState({
-      flash: this.state.flash,
+      flash: this.state.flash === 'torch' ? 'off' : 'torch',
       flashIcon: this.state.flashIcon
     })
   }
@@ -108,7 +126,7 @@ class Camera_S extends PureComponent {
   takePicture = async () => {
     let boolFlagvar = !this.state.boolFlag;
     if (this.camera) {
-      const options = { quality: 0.5, base64: true, orientation: RNCamera.Constants.ORIENTATION_UP,  fixOrientation: true, };
+      const options = { quality: 0.5, base64: true, orientation: RNCamera.Constants.ORIENTATION_UP, fixOrientation: true, };
       //  const data = await this.camera.takePictureAsync(options);
       const data = await this.camera.takePictureAsync(options);
       console.log(`data:image/png;base64,${data.uri}`);
@@ -140,7 +158,7 @@ class Camera_S extends PureComponent {
     bodyData.append('_id', String(10003));
     bodyData.append('image_data', String(imageData));
     try {
-      const ImageData = await fetch('http://192.168.1.5:5000/', {
+      const ImageData = await fetch('http://192.168.1.11:5000/', {
         method: "POST",
         headers: {
           'Accept': 'application/json',
@@ -172,7 +190,9 @@ class Camera_S extends PureComponent {
     }
   };
 
-
+  deleteClassificationData = () => {
+    this.setState({ classificationResult: '' })
+  }
 
   toggle = value => () =>
     this.setState(prevState => ({ [value]: !prevState[value] }));
@@ -222,6 +242,7 @@ class Camera_S extends PureComponent {
         <View style={{ width: width }}>
           <GTT_C_S
             classificationData={classificationResult}
+            onPress={() => { this.deleteClassificationData() }}
           />
           <C_Footer
             MicIcon={"ios-mic"}
@@ -237,6 +258,8 @@ class Camera_S extends PureComponent {
             RightIconName={"ios-reverse-camera"}
             RightIconColor={"white"}
             RightIconSize={34}
+            ASL_ISL_onPress={() => { this.onChange() }}
+            Icon_ASL_ISL={this.state.Icon_ASL_ISL}
             RightOnPress={this.toggleFacing.bind(this)} />
         </View>
       </RNCamera>
