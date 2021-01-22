@@ -13,6 +13,7 @@ import SLRDrawerContent from './src/components/DrawerContent';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
+import SplashScreen from './src/SplashScreen';
 
 
 
@@ -22,7 +23,8 @@ const Stack = createStackNavigator();
 export default class App extends Component {
 
   createHomeStack = () =>
-    <Stack.Navigator initialRouteName={"Camera"} >
+    <Stack.Navigator initialRouteName={"Splashscreen"} >
+      <Stack.Screen name="Splashscreen" component={SplashScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Camera" children={this.createDrawer} options={{ headerShown: false }} />
       <Stack.Screen name="History" component={ConvHistory} options={{ headerShown: false }} />
       <Stack.Screen name="TextToGesture" component={TextToGesture} options={{ headerShown: false }} />
