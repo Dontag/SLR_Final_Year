@@ -3,10 +3,18 @@ import {
   View,
   StatusBar,
   Dimensions,
-  ToastAndroid
+  ToastAndroid,
+  Text,
+  TouchableOpacity
 } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import Tflite from 'tflite-react-native';
+import auth from '@react-native-firebase/auth'
+import database from '@react-native-firebase/database';
+import RNFS from 'react-native-fs';
+import Tts from 'react-native-tts';
+import Modal from 'react-native-modal';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 //Styles
 import { styles } from './assets/styles/styles';
@@ -15,6 +23,7 @@ import { styles } from './assets/styles/styles';
 import C_Header from './components/Camera_Header';
 import C_Footer from './components/Camera_Footer';
 import GTT_C_S from './components/GTT_Camera_C';
+
 
 let tflite = new Tflite();
 const { height, width } = Dimensions.get('window');
@@ -42,7 +51,14 @@ class Camera_S extends PureComponent {
     flag: 1,
     boolFlag: false,
     classificationResult: '',
-    Icon_ASL_ISL: "ASL"
+    Icon_ASL_ISL: "ASL",
+    setAutomation: false,
+    setAutomationIcon: "ios-eye-off",
+    ASL_ISL_IconAccess: true,
+    spicIcon: "ios-volume-high",
+    voiceOnOff: true,
+    isModalVisible: false,
+    modalSwitch: false
   };
 
   componentDidMount() {
@@ -50,11 +66,55 @@ class Camera_S extends PureComponent {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       StatusBar.setHidden(true);
     });
+    this.__subscribe = auth().onAuthStateChanged((User) => {
+      if (User) {
+        console.log("User already Anonymously Logged In")
+      }
+      else {
+        auth().signInAnonymously()
+          .then(() => {
+            console.log("User Logged In")
+          })
+          .catch(error => {
+            if (error.code === 'auth/operation-not-allowed') {
+              console.log('Enable anonymous in your firebase console.');
+            }
+            console.error(error);
+          })
+      }
+    })
   }
 
   componentWillUnmount() {
     // StatusBar.setHidden(false);
     this._unsubscribe();
+    this.__subscribe();
+
+  }
+
+
+  setAutomation = () => {
+    let { setAutomation } = this.state;
+    let icon_name = ""
+    let setAccess = null
+    let setAutomationbol = false
+    if (!setAutomation) {
+      icon_name = "ios-eye"
+      setAccess = false
+      setAutomationbol = true
+    }
+    else {
+      icon_name = "ios-eye-off"
+      setAccess = true
+      setAutomationbol = false
+    }
+    this.setState({
+      setAutomation: setAutomationbol,
+      setAutomationIcon: icon_name,
+      Icon_ASL_ISL: "ASL",
+      ASL_ISL_IconAccess: setAccess,
+      classificationResult: ''
+    })
   }
 
   onChange = () => {
@@ -70,10 +130,26 @@ class Camera_S extends PureComponent {
     this.setState({ Icon_ASL_ISL: Data })
   }
 
+  enableVoice = () => {
+    let Data = "";
+    if (this.state.voiceOnOff === true) {
+      Data = "ios-volume-off"
+      ToastAndroid.show("Voice Off", ToastAndroid.SHORT)
+    }
+    else {
+      Data = "ios-volume-high"
+      ToastAndroid.show("Voice On", ToastAndroid.SHORT)
+    }
+    this.setState({ spicIcon: Data, voiceOnOff: this.state.voiceOnOff === true ? false : true })
+  }
 
   imageClassifier = (data) => {
-    let modelName = this.state.Icon_ASL_ISL === "ASL" ? 'models/asl_modal.tflite' : 'models/imageClassifier_M.tflite';
-    let modelLabels = this.state.Icon_ASL_ISL === "ASL" ? 'models/labels_asl.txt' : 'models/labels_2.txt';
+    let modelName = !this.state.setAutomation ?
+      this.state.Icon_ASL_ISL === "ASL" ? 'models/asl_modal.tflite' :
+        'models/imageClassifier_M.tflite' : "models/automation_model.tflite";
+    let modelLabels = !this.state.setAutomation ?
+      this.state.Icon_ASL_ISL === "ASL" ? 'models/labels_asl.txt' :
+        'models/labels_2.txt' : "models/automation_label.txt";
     tflite.loadModel({
       model: modelName,// required
       labels: modelLabels,  // required
@@ -87,8 +163,8 @@ class Camera_S extends PureComponent {
       });
     tflite.runModelOnImage({
       path: data,
-      imageMean: 128.0,
-      imageStd: 128.0,
+      imageMean: 158.0,
+      imageStd: 158.0,
       numResults: 1,
       threshold: 0.5
     },
@@ -97,11 +173,17 @@ class Camera_S extends PureComponent {
           console.log('Something went Wrong 1---->', err);
         } else {
           console.log('Result 1---->', res);
+          let label = '';
           res.map((labeldata) => {
             this.setState((prevState) => ({
-              classificationResult: prevState.classificationResult + labeldata.label,
+              classificationResult: !this.state.setAutomation ? prevState.classificationResult + labeldata.label : labeldata.label,
             }))
+            label = labeldata.label
           })
+          {
+            this.state.voiceOnOff ? Tts.speak(`${label}`) : null
+          }
+          RNFS.unlink(data);
         }
       });
     tflite.close();
@@ -137,39 +219,38 @@ class Camera_S extends PureComponent {
   takePicture = async () => {
     let boolFlagvar = !this.state.boolFlag;
     if (this.camera) {
-      const options = { quality: 0.5, base64: true, orientation: RNCamera.Constants.ORIENTATION_UP, fixOrientation: true, };
+      const options = {
+        quality: 0.5,
+        base64: true,
+        orientation: RNCamera.Constants.ORIENTATION_UP,
+        fixOrientation: true,
+        width: 224,
+        height: 224
+      };
       //  const data = await this.camera.takePictureAsync(options);
       const data = await this.camera.takePictureAsync(options);
-      console.log(`data:image/png;base64,${data.uri}`);
+      console.log(`data:image/png;base64,${data.base64}`);
       console.log(this.state.boolFlag, "bool");
-      this.getPostImageData(data.base64);
-      // this.getPostImageData(`data:image/png;base64,${data.base64}`);
+      {
+        this.state.modalSwitch ?
+          this.getPostImageData(data.base64) :
+          this.imageClassifier(data.uri)
+      }
       this.setState({
         boolFlag: boolFlagvar,
         snapData: data.uri,
       })
-      this.imageClassifier(data.uri);
+
     }
 
   }
 
   getPostImageData = async (imageData) => {
-    // try {
-    //   const ImageData = await fetch('http://192.168.1.5:5000/1020', {
-    //     method: "GET",
-    //   });
-    //   const responseData = await ImageData.json();
-    //   console.log('imageData-----', responseData)
-    //   console.log(ImageData, 'imageDataPostBody')
-    // } catch (err) {
-    //   console.log("Error fetching data-----------", err);
-    // }
-
     const bodyData = new FormData();
     bodyData.append('_id', String(10003));
     bodyData.append('image_data', String(imageData));
     try {
-      const ImageData = await fetch('http://192.168.1.11:5000/', {
+      const ImageData = await fetch('http://slirecog.ddns.net/', {
         method: "POST",
         headers: {
           'Accept': 'application/json',
@@ -178,28 +259,12 @@ class Camera_S extends PureComponent {
         body: bodyData
       });
       const responseData = await ImageData.json();
-      console.log('imageData-----', responseData)
-      console.log(ImageData, 'imageDataPostBody')
+      console.log('ResponseData-----', responseData)
+      // console.log(ImageData, 'imageDataPostBody')
     } catch (err) {
       console.log("Error fetching data-----------", err);
     }
   }
-
-  takeVideo = async () => {
-    const { isRecording } = this.state;
-    if (this.camera && !isRecording) {
-      try {
-        const promise = this.camera.recordAsync(this.state.recordOptions);
-        if (promise) {
-          this.setState({ isRecording: true });
-          const data = await promise;
-          console.warn('takeVideo', data);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  };
 
   deleteClassificationData = () => {
     this.setState({ classificationResult: '' })
@@ -208,7 +273,84 @@ class Camera_S extends PureComponent {
   toggle = value => () =>
     this.setState(prevState => ({ [value]: !prevState[value] }));
 
+  // Firebase Config
 
+  send = async () => {
+    let { classificationResult } = this.state;
+    if (classificationResult != '') {
+
+      let { classificationResult } = this.state;
+      const message = {
+        text: classificationResult,
+        timestamp: database.ServerValue.TIMESTAMP,
+        user_id: "1111",
+        place: "Bhusawal"
+      }
+      this.db.push(message)
+      this.deleteClassificationData();
+    }
+  };
+
+  off() {
+    this.db.off()
+  }
+
+  get db() {
+    const path = "1111";
+    //const path = "messages/";
+    return (database().ref(`history/${path}`))
+  }
+
+  onTpModalPress = () => {
+    this.props.navigation.navigate("TextToGesture")
+    this.setState({ isModalVisible: false })
+  }
+
+  //RenderModal
+  renderTPModal = () => {
+    let { isModalVisible } = this.state;
+    return (
+      <View>
+        <Modal
+          isVisible={isModalVisible}
+          backdropOpacity={0.8}
+          animationIn={"slideInUp"}
+          style={styles.__tpModal}
+          animationOut={"slideOutDown"}
+          animationInTiming={600}
+          animationOutTiming={600}
+          backdropTransitionInTiming={600}
+          backdropTransitionOutTiming={600}
+          swipeDirection={['down']}
+          onSwipeComplete={() => { this.setState({ isModalVisible: false }) }}
+        >
+          <View style={styles.__tpModalView}>
+            <TouchableOpacity onPress={() => { this.onTpModalPress() }} style={styles.__tpModalButton}>
+              <Text style={styles.__tpModalButtonText}>
+                Text To Gesture
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => { this.switchModal() }} style={[styles.__tpModalButton, { backgroundColor: this.state.modalSwitch ? "#16365e" : "#5f8ea3" }]}>
+              <Text style={styles.__tpModalButtonText}>
+                CNN
+              </Text>
+            </TouchableOpacity>
+            <Icon onPress={() => { this.setState({ isModalVisible: false }) }} style={styles.__tpModalIcon} name={"ios-arrow-up"} size={26} color={"#ffffff"} />
+          </View>
+        </Modal>
+      </View>
+    )
+  }
+
+  switchModal = () => {
+    this.setState({
+      modalSwitch: this.state.modalSwitch ? false : true,
+      ASL_ISL_IconAccess: this.state.modalSwitch ? true : false,
+      isModalVisible: false
+    })
+  }
+
+  //render Camera
   renderCamera() {
     let { classificationResult } = this.state;
     return (
@@ -243,6 +385,7 @@ class Camera_S extends PureComponent {
             CenterIconName={"ios-arrow-down"}
             CenterIconSize={34}
             CenterIconColor={"white"}
+            CenterOnPress={() => { this.setState({ isModalVisible: true }) }}
             CenterTextName={"Gesture To Text"}
             CenterTextColor={"white"}
             RightIconName={this.state.flashIcon}
@@ -253,22 +396,25 @@ class Camera_S extends PureComponent {
         <View style={{ width: width }}>
           <GTT_C_S
             classificationData={classificationResult}
-            onPress={() => { this.deleteClassificationData() }}
+            onPress={() => { this.send() }}
+            automation={this.state.setAutomation}
           />
           <C_Footer
-            MicIcon={"ios-mic"}
+            spicIcon={this.state.spicIcon}
             ASL_ISL_Icon={"ASL"}
-            LeftIconName={"ios-options"}
+            LeftIconName={this.state.setAutomationIcon}
             LeftIconColor={"white"}
             LeftIconSize={26}
-            LeftOnPress={() => { this.getPostImageData() }}
+            LeftOnPress={() => { this.setAutomation() }}
             CenterIconName={"ios-radio-button-on"}
             CenterIconColor={"white"}
             CenterIconSize={65}
+            CenterLeftOnPress={() => { this.enableVoice() }}
             CenterOnPress={this.takePicture.bind(this)}
             RightIconName={"ios-reverse-camera"}
             RightIconColor={"white"}
             RightIconSize={34}
+            ASL_ISL_IconAccess={this.state.ASL_ISL_IconAccess}
             ASL_ISL_onPress={() => { this.onChange() }}
             Icon_ASL_ISL={this.state.Icon_ASL_ISL}
             RightOnPress={this.toggleFacing.bind(this)} />
@@ -281,6 +427,7 @@ class Camera_S extends PureComponent {
     return (
       <View style={styles.Camera_S_Container_View}>
         {/* <StatusBar hidden={true} /> */}
+        {this.renderTPModal()}
         {this.renderCamera()}
       </View>);
   }

@@ -1,29 +1,31 @@
 import React, { Component } from 'react';
 import { Text, StyleSheet, View, Dimensions, TouchableOpacity } from 'react-native';
-
+import moment from 'moment';
 let { height, width } = Dimensions.get('window');
 
 export default class HistoryCard extends Component {
     render() {
-        let { onPress } = this.props;
+        let { data } = this.props;
         return (
             <View style={styles.__container}>
-                <TouchableOpacity activeOpacity={0.7} onPress={onPress} style={styles.__containerContent}>
+                <TouchableOpacity activeOpacity={0.7} style={styles.__containerContent}>
                     <View style={styles.__cardTopView}>
                         <View style={styles.__cardTopInnerView}>
                             <Text style={styles.__cardTopLabelText}>Place: </Text>
-                            <Text style={styles.__cardTopTitleText}>Bhusawal</Text>
+                            <Text style={styles.__cardTopTitleText}>{data.place}</Text>
                         </View>
                         <View style={styles.__cardTopInnerView}>
                             <Text style={styles.__cardTopLabelText}>Date: </Text>
-                            <Text style={styles.__cardTopTitleText}>1 Jan 2021 | 10:00 AM</Text>
+                            <Text style={styles.__cardTopTitleText}>{moment(data.createdAt).format('DD MMM YY | h:mm a')}</Text>
                         </View>
                     </View>
                     <View style={styles.__cardBottonView}>
                         <Text style={styles.__cardBottomTextView}>
-                            dfakldjfklajdfklajsdfklajdslkfjakldjfalk;dfakldjfklajdfklajsdfklajdslkfjakldjfalkasdfldf
-                            asdfasdfasdfasdffasfsd
-                    </Text>
+                            Message:-
+                        </Text>
+                        <Text style={styles.__cardBottomTextView}>
+                            {data.text}
+                        </Text>
                     </View>
                 </TouchableOpacity>
             </View>
@@ -64,11 +66,11 @@ const styles = StyleSheet.create({
     },
     __cardBottonView: {
         alignItems: "center",
-        justifyContent: "center",
-        paddingVertical: 3
+        paddingVertical: 3,
+        flexDirection: "row",
+        marginHorizontal: 10
     },
     __cardBottomTextView: {
-        textAlign: "center",
         fontSize: 16,
         color: "#147f91"
     },
