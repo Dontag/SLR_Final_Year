@@ -79,6 +79,8 @@ target 'SLR_Sign_Language' do
 
   pod 'TfliteReactNative', :path => '../node_modules/tflite-react-native'
 
+  pod 'react-native-image-resizer', :path => '../node_modules/react-native-image-resizer'
+
   target 'SLR_Sign_LanguageTests' do
     inherit! :complete
     # Pods for testing
