@@ -15,6 +15,7 @@ import RNFS from 'react-native-fs';
 import Tts from 'react-native-tts';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/Ionicons';
+import ImagePicker from 'react-native-image-crop-picker';
 
 //Styles
 import { styles } from './assets/styles/styles';
@@ -48,6 +49,8 @@ class Camera_S extends PureComponent {
     submitDataFlag: 0,
     setBarRun: 0,
     snapData: '',
+    mode: 'contain',
+    onlyScaleDown: false,
     flag: 1,
     boolFlag: false,
     classificationResult: '',
@@ -58,7 +61,9 @@ class Camera_S extends PureComponent {
     spicIcon: "ios-volume-high",
     voiceOnOff: true,
     isModalVisible: false,
-    modalSwitch: false
+    modalSwitch: false,
+    changeToCrop: "Switch To Crop",
+    changeToCropBol: false
   };
 
   componentDidMount() {
@@ -229,9 +234,11 @@ class Camera_S extends PureComponent {
       };
       //  const data = await this.camera.takePictureAsync(options);
       const data = await this.camera.takePictureAsync(options);
-      console.log(`data:image/png;base64,${data.base64}`);
+      console.log(`data:image/png;base64,${data.uri}`);
       console.log(this.state.boolFlag, "bool");
       {
+        this.state.changeToCropBol ?
+        this.cropImage(data) :
         this.state.modalSwitch ?
           this.getPostImageData(data.base64) :
           this.imageClassifier(data.uri)
@@ -243,6 +250,24 @@ class Camera_S extends PureComponent {
 
     }
 
+  }
+
+  cropImage = (data) => {
+    ImagePicker.openCropper({
+      path: data.uri,
+      width: 600,
+      height: 600,
+      includeBase64: true,
+      cropping: true
+    }).then(image => {
+      {
+        this.state.modalSwitch ?
+          this.getPostImageData(image.data) :
+          this.imageClassifier(image.path)
+      }
+      // console.log(image.data)
+      // console.log(image.path);
+    });
   }
 
   getPostImageData = async (imageData) => {
@@ -342,6 +367,13 @@ class Camera_S extends PureComponent {
     )
   }
 
+  switchCroppingMode = () => {
+    this.setState({
+      changeToCrop: this.state.changeToCropBol ? "Switch To Crop" : "Switch To Normal",
+      changeToCropBol: this.state.changeToCropBol ? false : true
+    })
+  }
+
   switchModal = () => {
     this.setState({
       modalSwitch: this.state.modalSwitch ? false : true,
@@ -392,6 +424,11 @@ class Camera_S extends PureComponent {
             RightIconSize={26}
             RightIconColor={"white"}
             RightOnPress={this.toggleFlash.bind(this)} />
+        </View>
+        <View style={styles.boxMarker}>
+          <TouchableOpacity onPress={() => { this.switchCroppingMode() }} style={styles.changeToCropView}>
+            <Text style={styles.changeToCropText}>{this.state.changeToCrop}</Text>
+          </TouchableOpacity>
         </View>
         <View style={{ width: width }}>
           <GTT_C_S

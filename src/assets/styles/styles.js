@@ -15,15 +15,31 @@ export const styles = StyleSheet.create({
     margin: "4%",
     backgroundColor: 'blue',
   },
-  Camera_S_faces_Barcode_Container: {
-    // position: 'absolute',
-    // bottom: 0,
-    // right: 0,
-    // left: 0,
-    // top: 0,
+  boxMarker: {
+    padding: 10,
+    width: 224,
+    height: 224,
+    borderWidth: 1,
+    borderRadius: 5,
+    position: 'absolute',
+    borderColor: 'rgba(197, 235, 231,0.5)',
+    justifyContent: 'flex-end',
+    alignItems: "center",
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    alignSelf: "center",
+    marginVertical: height / 3
   },
-  __tpModal: {
-
+  changeToCropView: {
+    padding: 5,
+    paddingHorizontal: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 30,
+    backgroundColor: "rgba(0, 0, 0,0.2)"
+  },
+  changeToCropText: {
+    color: "#ffffff",
+    fontSize: 14
   },
   __tpModalView: {
     borderRadius: 20,

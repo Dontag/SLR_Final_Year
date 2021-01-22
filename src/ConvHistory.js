@@ -110,7 +110,7 @@ export default class ConvHistory extends Component {
 
     render() {
         let { messages } = this.state;
-        console.log("this is message", messages)
+        // console.log("this is message", messages)
         return (
             <View style={styles.__container}>
                 <StatusBar backgroundColor={"#43aeba"} hidden={false} barStyle={'dark-content'} />
