@@ -25,7 +25,7 @@ class TextToGesture extends Component {
    }
    onChangeLabel = (text) => {
       this.setState({ inputData: text.toLowerCase(), imagePath: null })
-      this.setSwitch(text.toLowerCase())
+      this.setSwitch(text.charAt((text).length - 1).toLowerCase())
    }
 
    setSwitch(alphabet) {

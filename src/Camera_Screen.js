@@ -57,7 +57,8 @@ class Camera_S extends PureComponent {
     ASL_ISL_IconAccess: true,
     spicIcon: "ios-volume-high",
     voiceOnOff: true,
-    isModalVisible: false
+    isModalVisible: false,
+    modalSwitch: false
   };
 
   componentDidMount() {
@@ -162,8 +163,8 @@ class Camera_S extends PureComponent {
       });
     tflite.runModelOnImage({
       path: data,
-      imageMean: 128.0,
-      imageStd: 128.0,
+      imageMean: 158.0,
+      imageStd: 158.0,
       numResults: 1,
       threshold: 0.5
     },
@@ -218,18 +219,28 @@ class Camera_S extends PureComponent {
   takePicture = async () => {
     let boolFlagvar = !this.state.boolFlag;
     if (this.camera) {
-      const options = { quality: 0.5, base64: true, orientation: RNCamera.Constants.ORIENTATION_UP, fixOrientation: true, };
+      const options = {
+        quality: 0.5,
+        base64: true,
+        orientation: RNCamera.Constants.ORIENTATION_UP,
+        fixOrientation: true,
+        width: 224,
+        height: 224
+      };
       //  const data = await this.camera.takePictureAsync(options);
       const data = await this.camera.takePictureAsync(options);
-      console.log(`data:image/png;base64,${data.uri}`);
+      console.log(`data:image/png;base64,${data.base64}`);
       console.log(this.state.boolFlag, "bool");
-      this.getPostImageData(data.base64);
-      // this.getPostImageData(`data:image/png;base64,${data.base64}`);
+      {
+        this.state.modalSwitch ?
+          this.getPostImageData(data.base64) :
+          this.imageClassifier(data.uri)
+      }
       this.setState({
         boolFlag: boolFlagvar,
         snapData: data.uri,
       })
-      this.imageClassifier(data.uri);
+
     }
 
   }
@@ -239,7 +250,7 @@ class Camera_S extends PureComponent {
     bodyData.append('_id', String(10003));
     bodyData.append('image_data', String(imageData));
     try {
-      const ImageData = await fetch('http://192.168.1.11:5000/', {
+      const ImageData = await fetch('http://slirecog.ddns.net/', {
         method: "POST",
         headers: {
           'Accept': 'application/json',
@@ -248,8 +259,8 @@ class Camera_S extends PureComponent {
         body: bodyData
       });
       const responseData = await ImageData.json();
-      console.log('imageData-----', responseData)
-      console.log(ImageData, 'imageDataPostBody')
+      console.log('ResponseData-----', responseData)
+      // console.log(ImageData, 'imageDataPostBody')
     } catch (err) {
       console.log("Error fetching data-----------", err);
     }
@@ -319,11 +330,24 @@ class Camera_S extends PureComponent {
                 Text To Gesture
               </Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={() => { this.switchModal() }} style={[styles.__tpModalButton, { backgroundColor: this.state.modalSwitch ? "#16365e" : "#5f8ea3" }]}>
+              <Text style={styles.__tpModalButtonText}>
+                CNN
+              </Text>
+            </TouchableOpacity>
             <Icon onPress={() => { this.setState({ isModalVisible: false }) }} style={styles.__tpModalIcon} name={"ios-arrow-up"} size={26} color={"#ffffff"} />
           </View>
         </Modal>
       </View>
     )
+  }
+
+  switchModal = () => {
+    this.setState({
+      modalSwitch: this.state.modalSwitch ? false : true,
+      ASL_ISL_IconAccess: this.state.modalSwitch ? true : false,
+      isModalVisible: false
+    })
   }
 
   //render Camera
