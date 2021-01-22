@@ -21,13 +21,11 @@ export const styles = StyleSheet.create({
     height: 224,
     borderWidth: 1,
     borderRadius: 5,
-    position: 'absolute',
     borderColor: 'rgba(197, 235, 231,0.5)',
     justifyContent: 'flex-end',
     alignItems: "center",
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
     alignSelf: "center",
-    marginVertical: height / 3
   },
   changeToCropView: {
     padding: 5,

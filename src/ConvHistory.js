@@ -131,7 +131,6 @@ export default class ConvHistory extends Component {
                         // ItemSeparatorComponent={this.ItemSeparatorComponent}
                         />
                     </View>}
-
             </View>
         )
     }
